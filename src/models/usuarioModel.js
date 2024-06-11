@@ -22,25 +22,29 @@ const usuarioSchema = new mongoose.Schema({
   },
   rol: {
     type: String,
-    enum: ['Administrador', 'Docente'],
+    enum: ['Administrador', 'Docente', 'Usuario'],
     default: 'Docente'
   }
 }, {
-  timestamps: true // Añade timestamps automáticamente
+  timestamps: true 
 });
 
-// Agregamos un nuevo campo al módulo de usuarios para guardar el rol
+// Middleware para encriptar la contraseña antes de guardar
 usuarioSchema.pre('save', async function (next) {
   if (!this.isModified('password')) return next();
 
   try {
-    const hashedPassword = await bcrypt.hash(this.password, 10);
-    this.password = hashedPassword;
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
     next();
   } catch (error) {
     return next(error);
   }
 });
+
+usuarioSchema.methods.comparePassword = function(password) {
+  return bcrypt.compare(password, this.password);
+};
 
 const Usuario = mongoose.model('Usuario', usuarioSchema);
 
