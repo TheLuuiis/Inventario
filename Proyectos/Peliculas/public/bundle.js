@@ -4,7 +4,6 @@ const cargarTitulos = async (resultados = []) => {
 	const contenedor = document.querySelector('#populares .main__grid');
 
 	try {
-		// Reiniciamos las peliculas
 		contenedor.innerHTML = '';
 
 		resultados.forEach((resultado) => {
